@@ -1,8 +1,11 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
+subdir('widgets')
+
 contortSrcs = [
 	'decoration.cxx',
-	'screen.cxx', 'mainLoop.cxx'
+	'textLayout.cxx', 'utils.cxx', 'screen.cxx', 'mainLoop.cxx',
+	'widget.cxx', contortWidgetsSrc
 ]
 
 substrate = dependency(

@@ -20,8 +20,6 @@ namespace contort
 		const char *what() const noexcept final { return error_.data(); }
 	};
 
-	struct layout_t { };
-
 	using segment_t = std::tuple<size_t, size_t, std::variant<std::monostate, std::size_t, std::string_view>>;
 	using segmentList_t = std::vector<segment_t>;
 	using segments_t = std::vector<segmentList_t>;
@@ -31,7 +29,7 @@ namespace contort
 		virtual ~textLayout_t() noexcept = default;
 		virtual bool supportsAlignMode(horizontalAlignment_t) const noexcept { return true; }
 		virtual bool supportsWrapMode(wrapping_t) const noexcept { return true; }
-		virtual std::vector<layout_t> layout(std::string_view text, uint32_t width,
+		virtual segments_t layout(std::string_view text, uint32_t width,
 			horizontalAlignment_t align, wrapping_t wrap) const noexcept = 0;
 	};
 
@@ -40,7 +38,7 @@ namespace contort
 		~standardTextLayout_t() noexcept final = default;
 		bool supportsAlignMode(horizontalAlignment_t align) const noexcept final;
 		bool supportsWrapMode(wrapping_t wrap) const noexcept final;
-		std::vector<layout_t> layout(std::string_view text, uint32_t width,
+		segments_t layout(std::string_view text, uint32_t width,
 			horizontalAlignment_t align, wrapping_t wrap) const noexcept final;
 
 		void alignLayout(segments_t &segments, uint32_t width, horizontalAlignment_t align) const noexcept;

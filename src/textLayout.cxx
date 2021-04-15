@@ -47,12 +47,12 @@ namespace contort
 	bool standardTextLayout_t::supportsWrapMode(const wrapping_t wrap) const noexcept
 		{ return wrapValueIs_t<wrapping_t::any, wrapping_t::space, wrapping_t::clip, wrapping_t::ellipsis>{}(wrap); }
 
-	std::vector<layout_t> standardTextLayout_t::layout(const std::string_view text, const uint32_t width,
+	segments_t standardTextLayout_t::layout(const std::string_view text, const uint32_t width,
 		const horizontalAlignment_t align, const wrapping_t wrap) const noexcept try
 	{
-		const auto segments{calculateTextSegments(text, width, wrap)};
-
-		return {};
+		auto layout{calculateTextSegments(text, width, wrap)};
+		alignLayout(layout, width, align);
+		return layout;
 	}
 	catch (const cantDisplayText_t &)
 		{ return {}; }

@@ -21,6 +21,10 @@ namespace contort::utils
 	std::tuple<std::string> decomposeTagmarkup(markup_t markup);
 
 	size_t calcWidth(std::string_view text, size_t begin, size_t end) noexcept;
+	std::tuple<size_t, size_t> calcTextPos(std::string_view text, size_t beginOffset,
+		size_t endOffset, size_t preferedColumn) noexcept;
+	std::tuple<size_t, size_t, size_t, size_t> calcTrimText(std::string_view text,
+		size_t beginOffset, size_t endOffset, size_t startCol, size_t endCol) noexcept;
 } // namespace contort::utils
 
 #endif /*CONTORT_UTILS__HXX*/

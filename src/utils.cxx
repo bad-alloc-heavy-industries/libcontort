@@ -115,4 +115,47 @@ namespace contort::utils
 		}
 		return cols;
 	}
+
+	std::tuple<size_t, size_t> calcTextPos(const std::string_view text, const size_t beginOffset,
+		const size_t endOffset, const size_t preferedColumn) noexcept
+	{
+		size_t cols{0};
+		for (size_t i = beginOffset; i < endOffset; )
+		{
+			const auto [codepoint, offset] = decodeOne(text, i);
+			const auto width{screenWidth(codepoint)};
+
+			if (width + cols > preferedColumn)
+				return {i, cols};
+
+			i = offset;
+			cols += width;
+		}
+		return {endOffset, cols};
+	}
+
+	std::tuple<size_t, size_t, size_t, size_t> calcTrimText(const std::string_view text,
+		const size_t beginOffset, const size_t endOffset, const size_t startCol, const size_t endCol) noexcept
+	{
+		auto begin{beginOffset};
+		size_t padLeft{0};
+		size_t padRight{0};
+		size_t screenCols{0};
+
+		if (startCol > 0)
+		{
+			std::tie(begin, screenCols) = calcTextPos(text, beginOffset, endOffset, startCol);
+			if (screenCols < startCol)
+			{
+				padLeft = 1;
+				std::tie(begin, screenCols) = calcTextPos(text, beginOffset, endOffset, startCol + 1);
+			}
+		}
+		const auto run{endCol - startCol - padLeft};
+		size_t end{0};
+		std::tie(end, screenCols) = calcTextPos(text, begin, endOffset, run);
+		if (screenCols < run)
+			padRight = 1;
+		return {begin, end, padLeft, padRight};
+	}
 } // namespace contort::utils

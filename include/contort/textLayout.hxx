@@ -5,6 +5,7 @@
 #include <string_view>
 #include <stdexcept>
 #include <vector>
+#include <variant>
 #include <contort/widget.hxx>
 
 namespace contort
@@ -17,8 +18,9 @@ namespace contort
 
 	struct layout_t { };
 
-	using segment_t = std::tuple<size_t, size_t>;
-	using segments_t = std::vector<std::vector<segment_t>>;
+	using segment_t = std::tuple<size_t, size_t, std::variant<std::monostate, std::size_t, std::string_view>>;
+	using segmentList_t = std::vector<segment_t>;
+	using segments_t = std::vector<segmentList_t>;
 
 	struct textLayout_t
 	{

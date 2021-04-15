@@ -43,6 +43,7 @@ namespace contort
 		std::vector<layout_t> layout(std::string_view text, uint32_t width,
 			horizontalAlignment_t align, wrapping_t wrap) const noexcept final;
 
+		void alignLayout(segments_t &segments, uint32_t width, horizontalAlignment_t align) const noexcept;
 		segments_t calculateTextSegments(std::string_view text, uint32_t width, wrapping_t wrap) const;
 	};
 

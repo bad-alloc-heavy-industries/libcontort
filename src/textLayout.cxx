@@ -8,6 +8,20 @@ namespace contort
 {
 	constexpr static auto ellipsis{u8"…"sv};
 
+	size_t lineWidth(const segmentList_t &segmentList)
+	{
+		size_t screenCols{0};
+		for (const auto &segment : segmentList)
+		{
+			const auto &[columns, begin, end] = segment;
+			// TODO: Constrain condition to only apply to the first segment in the list.
+			if (std::holds_alternative<std::monostate>(end) && begin == 0)
+				continue;
+			screenCols += columns;
+		}
+		return screenCols;
+	}
+
 	template<horizontalAlignment_t...> struct alignValueIs_t;
 	template<horizontalAlignment_t a, horizontalAlignment_t... aligns> struct alignValueIs_t<a, aligns...>
 	{
@@ -42,6 +56,21 @@ namespace contort
 	}
 	catch (const cantDisplayText_t &)
 		{ return {}; }
+
+	void standardTextLayout_t::alignLayout(segments_t &layout, const uint32_t width,
+		const horizontalAlignment_t align) const noexcept
+	{
+		for (auto &segments : layout)
+		{
+			const auto screenCols{lineWidth(segments)};
+			if (screenCols == width || align == horizontalAlignment_t::left)
+				continue;
+			else if (align == horizontalAlignment_t::right)
+				segments.emplace(segments.begin(), segment_t{width - screenCols, 0, std::monostate{}});
+			else
+				segments.emplace(segments.begin(), segment_t{(width - screenCols + 1) / 2, 0, std::monostate{}});
+		}
+	}
 
 	segments_t standardTextLayout_t::calculateTextSegments(const std::string_view text,
 		const uint32_t width, const wrapping_t wrap) const

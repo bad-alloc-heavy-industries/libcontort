@@ -48,4 +48,7 @@ namespace contort::widgets
 	{
 		widget_t::invalidate();
 	}
+
+	textError_t::textError_t(const std::string_view format, ...) noexcept :
+		what_{format} { }
 } // namespace contort::widgets

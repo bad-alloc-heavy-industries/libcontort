@@ -169,40 +169,86 @@ namespace contort
 				continue;
 			}
 
-			if (offset > i)
+			auto breakWord{true};
+			auto prevOffset{offset};
+			while (prevOffset > i)
 			{
-				auto prevOffset{offset};
-				while (prevOffset > i)
+				prevOffset = utils::movePrevChar(text, i, prevOffset);
+				if (text[prevOffset] == ' ')
 				{
-					prevOffset = utils::movePrevChar(text, i, prevOffset);
-					if (text[prevOffset] == ' ')
-					{
-						screenCols = utils::calcWidth(text, i, prevOffset);
-						segmentList_t segment{{0, prevOffset, std::monostate{}}};
-						if (i != prevOffset)
-							segment.emplace(segment.begin(), segment_t{screenCols, i, prevOffset});
-						segments.emplace_back(std::move(segment));
-						i = prevOffset + 1;
-						break;
-					}
-					else if (utils::isWideChar(text, prevOffset))
-					{
-						const auto nextOffset{utils::moveNextChar(text, prevOffset, offset)};
-						screenCols = utils::calcWidth(text, i, nextOffset);
-						segments.emplace_back(segmentList_t{{screenCols, i, nextOffset}});
-						i = nextOffset;
-						break;
-					}
+					screenCols = utils::calcWidth(text, i, prevOffset);
+					segmentList_t segment{{0, prevOffset, std::monostate{}}};
+					if (i != prevOffset)
+						segment.emplace(segment.begin(), segment_t{screenCols, i, prevOffset});
+					segments.emplace_back(std::move(segment));
+					i = prevOffset + 1;
+					breakWord = false;
+					break;
+				}
+				else if (utils::isWideChar(text, prevOffset))
+				{
+					const auto nextOffset{utils::moveNextChar(text, prevOffset, offset)};
+					screenCols = utils::calcWidth(text, i, nextOffset);
+					segments.emplace_back(segmentList_t{{screenCols, i, nextOffset}});
+					i = nextOffset;
+					breakWord = false;
+					break;
 				}
 			}
-			else
+
+			if (breakWord && !segments.empty())
 			{
+				auto &lastSegment{segments.back()};
+				// If we didn't exit the above while loop through a break statement, then
+				// we didn't find anywhere to break the line and have to break a word.
+				if (lastSegment.size() == 2 || (lastSegment.size() == 1 &&
+					std::holds_alternative<std::monostate>(std::get<2>(lastSegment[0])) &&
+					std::get<1>(lastSegment[0]) == 0))
+				{
+					size_t alignScreenCols{0};
+					size_t alignOffset{0};
+					size_t lineScreenCols{0};
+					size_t lineOffset{0};
+					size_t lineEnd{0};
+
+					if (lastSegment.size() == 1)
+					{
+						const auto &[screenCols, offset, _] = lastSegment[0];
+						(void)_;
+						alignScreenCols = screenCols;
+						alignOffset = offset;
+						lineOffset = lineEnd = offset;
+					}
+					else
+					{
+						std::remove_reference_t<decltype(std::get<2>(lastSegment[0]))> end{};
+						std::tie(lineScreenCols, lineOffset, end) = lastSegment[0];
+						const auto &[screenCols, offset, _] = lastSegment[1];
+						(void)_;
+						alignScreenCols = screenCols;
+						alignOffset = offset;
+					}
+
+					if (lineScreenCols < width && alignScreenCols == 0 && text[alignOffset] == ' ')
+					{
+						segments.pop_back();
+						i = lineOffset;
+						std::tie(offset, screenCols) = utils::calcTextPos(text, i, lineEnd, width);
+						segments.emplace_back(segmentList_t{{screenCols, i, offset}});
+						i = offset;
+						if (i < text.length() && (text[i] == ' ' || text[i] == '\n'))
+						{
+							segments.back().emplace_back(segment_t{0, i, std::monostate{}});
+							++i;
+						}
+						continue;
+					}
+				}
 			}
 
 			segments.emplace_back(segmentList_t{{screenCols, i, offset}});
 			i = offset;
 		}
-
 		return segments;
 	}
 } // namespace contort

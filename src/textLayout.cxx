@@ -85,6 +85,95 @@ namespace contort
 			return segments;
 		}
 
-		return {};
+		segments_t segments{};
+		for (size_t i = 0; i < text.length(); )
+		{
+			auto lineEnd{[=]()
+			{
+				const auto end{text.find('\n', i)};
+				if (end == std::string_view::npos)
+					return text.length() - 1;
+				return end;
+			}()};
+			auto screenCols{utils::calcWidth(text, i, lineEnd)};
+
+			if (screenCols == 0)
+			{
+				segments.emplace_back(segmentList_t{{0, lineEnd, std::monostate{}}});
+				i = lineEnd + 1;
+				continue;
+			}
+			else if (screenCols < width)
+			{
+				segments.emplace_back(segmentList_t{
+					{screenCols, i, lineEnd},
+					{0, lineEnd, std::monostate{}}
+				});
+				i = lineEnd + 1;
+				continue;
+			}
+
+			size_t offset{0};
+			std::tie(offset, screenCols) = utils::calcTextPos(text, i, lineEnd, width);
+			if (offset == i)
+				throw cantDisplayText_t{"Wide character will not fit in 1-column width"sv};
+			else if (wrap == wrapping_t::any)
+			{
+				segments.emplace_back(segmentList_t{{screenCols, i, offset}});
+				i = offset;
+				continue;
+			}
+			// wrap == wrapping_t::space
+			if (text[offset] == ' ')
+			{
+				segments.emplace_back(segmentList_t{
+					{screenCols, i, offset},
+					{0, offset, std::monostate{}}
+				});
+				i = offset + 1;
+				continue;
+			}
+			else if (utils::isWideChar(text, offset))
+			{
+				segments.emplace_back(segmentList_t{{screenCols, i, offset}});
+				i = offset;
+				continue;
+			}
+
+			if (offset > i)
+			{
+				auto prevOffset{offset};
+				while (prevOffset > i)
+				{
+					prevOffset = utils::movePrevChar(text, i, prevOffset);
+					if (text[prevOffset] == ' ')
+					{
+						screenCols = utils::calcWidth(text, i, prevOffset);
+						segmentList_t segment{{0, prevOffset, std::monostate{}}};
+						if (i != prevOffset)
+							segment.emplace(segment.begin(), segment_t{screenCols, i, prevOffset});
+						segments.emplace_back(std::move(segment));
+						i = prevOffset + 1;
+						break;
+					}
+					else if (utils::isWideChar(text, prevOffset))
+					{
+						const auto nextOffset{utils::moveNextChar(text, prevOffset, offset)};
+						screenCols = utils::calcWidth(text, i, nextOffset);
+						segments.emplace_back(segmentList_t{{screenCols, i, nextOffset}});
+						i = nextOffset;
+						break;
+					}
+				}
+			}
+			else
+			{
+			}
+
+			segments.emplace_back(segmentList_t{{screenCols, i, offset}});
+			i = offset;
+		}
+
+		return segments;
 	}
 } // namespace contort

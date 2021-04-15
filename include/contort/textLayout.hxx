@@ -12,8 +12,12 @@ namespace contort
 {
 	struct CONTORT_CLS_API cantDisplayText_t final : std::exception
 	{
+	private:
+		std::string_view error_;
+
 	public:
-		const char *what() const noexcept final { return ""; }
+		cantDisplayText_t(const std::string_view error) : error_{error} { }
+		const char *what() const noexcept final { return error_.data(); }
 	};
 
 	struct layout_t { };

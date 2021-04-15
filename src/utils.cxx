@@ -100,6 +100,28 @@ namespace contort::utils
 		return 1U;
 	}
 
+	bool isWideChar(const std::string_view text, const size_t offset) noexcept
+	{
+		const auto codepoint{std::get<0>(decodeOne(text, offset))};
+		return screenWidth(codepoint) >= 2;
+	}
+
+	size_t movePrevChar(const std::string_view text, const size_t begin, const size_t end) noexcept
+	{
+		auto offset{end - 1};
+		while (offset > begin && (text[offset] & 0xC0) == 0x80)
+			--offset;
+		return offset;
+	}
+
+	size_t moveNextChar(const std::string_view text, const size_t begin, const size_t end) noexcept
+	{
+		auto offset{begin + 1};
+		while (offset < end && (text[offset] & 0xC0) == 0x80)
+			++offset;
+		return offset;
+	}
+
 	size_t calcWidth(const std::string_view text, const size_t begin, const size_t end) noexcept
 	{
 		if (begin > text.length())

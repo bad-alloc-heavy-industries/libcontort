@@ -20,6 +20,10 @@ namespace contort::utils
 
 	std::tuple<std::string> decomposeTagmarkup(markup_t markup);
 
+	bool isWideChar(std::string_view text, size_t offset) noexcept;
+	size_t movePrevChar(std::string_view text, size_t begin, size_t end) noexcept;
+	size_t moveNextChar(std::string_view text, size_t begin, size_t end) noexcept;
+
 	size_t calcWidth(std::string_view text, size_t begin, size_t end) noexcept;
 	std::tuple<size_t, size_t> calcTextPos(std::string_view text, size_t beginOffset,
 		size_t endOffset, size_t preferedColumn) noexcept;

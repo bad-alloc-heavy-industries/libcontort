@@ -10,7 +10,7 @@
 
 namespace contort
 {
-	struct cantDisplayText_t final : std::exception
+	struct CONTORT_CLS_API cantDisplayText_t final : std::exception
 	{
 	public:
 		const char *what() const noexcept final { return ""; }
@@ -22,7 +22,7 @@ namespace contort
 	using segmentList_t = std::vector<segment_t>;
 	using segments_t = std::vector<segmentList_t>;
 
-	struct textLayout_t
+	struct CONTORT_CLS_API textLayout_t
 	{
 		virtual ~textLayout_t() noexcept = default;
 		virtual bool supportsAlignMode(horizontalAlignment_t) const noexcept { return true; }
@@ -31,7 +31,7 @@ namespace contort
 			horizontalAlignment_t align, wrapping_t wrap) const noexcept = 0;
 	};
 
-	struct standardTextLayout_t final : textLayout_t
+	struct CONTORT_CLS_API standardTextLayout_t final : textLayout_t
 	{
 		~standardTextLayout_t() noexcept final = default;
 		bool supportsAlignMode(horizontalAlignment_t align) const noexcept final;

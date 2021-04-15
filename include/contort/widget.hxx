@@ -77,7 +77,7 @@ namespace contort
 			const std::enable_if_t<is_attribute_v<U>, U> b) noexcept
 		{ return attributes_t{a} | b; }
 
-	struct widget_t
+	struct CONTORT_CLS_API widget_t
 	{
 	protected:
 		bool selectable_{false};

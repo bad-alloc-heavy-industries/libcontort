@@ -9,7 +9,7 @@
 
 namespace contort
 {
-	struct mainLoop_t
+	struct CONTORT_CLS_API mainLoop_t
 	{
 	private:
 		widget_t *widget_;

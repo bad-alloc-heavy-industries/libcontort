@@ -9,7 +9,7 @@
 
 namespace contort
 {
-	struct screen_t final
+	struct CONTORT_CLS_API screen_t final
 	{
 		int32_t termInput{-1};
 		int32_t termOutput{-1};

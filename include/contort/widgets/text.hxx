@@ -10,7 +10,7 @@
 
 namespace contort::widgets
 {
-	struct textError_t : std::exception
+	struct CONTORT_CLS_API textError_t : std::exception
 	{
 	private:
 		std::string what_{};
@@ -20,7 +20,7 @@ namespace contort::widgets
 		const char *what() const noexcept final { return what_.c_str(); }
 	};
 
-	struct text_t final : widget_t
+	struct CONTORT_CLS_API text_t final : widget_t
 	{
 	private:
 		std::string text_{};

@@ -2,8 +2,12 @@
 #include <contort/textLayout.hxx>
 #include <contort/utils.hxx>
 
+using namespace std::literals::string_view_literals;
+
 namespace contort
 {
+	constexpr static auto ellipsis{u8"…"sv};
+
 	template<horizontalAlignment_t...> struct alignValueIs_t;
 	template<horizontalAlignment_t a, horizontalAlignment_t... aligns> struct alignValueIs_t<a, aligns...>
 	{
@@ -47,7 +51,6 @@ namespace contort
 			segments_t segments{};
 			for (size_t i = 0; i < text.length(); )
 			{
-				std::vector<segment_t> segment{};
 				auto lineEnd{[=]()
 				{
 					const auto end{text.find('\n', i)};
@@ -55,16 +58,27 @@ namespace contort
 						return text.length() - 1;
 					return end;
 				}()};
-				const auto screenCols{utils::calcWidth(text, i, lineEnd)};
+				auto screenCols{utils::calcWidth(text, i, lineEnd)};
 
+				size_t end{lineEnd};
+				size_t padRight{0};
 				const auto trimmed{wrap == wrapping_t::ellipsis && screenCols > width};
 				if (trimmed)
 				{
-				}
-				else
-				{
+					size_t begin{0};
+					size_t padLeft{0};
+					std::tie(begin, end, padLeft, padRight) = utils::calcTrimText(text, i, lineEnd, 0, width - 1);
+					//padLeft == 0
+					//begin == i
+					screenCols = width - 1 - padRight;
 				}
 
+				segmentList_t segment{};
+				if (i != end)
+					segment.emplace_back(screenCols, i, end);
+				if (trimmed)
+					segment.emplace_back(1, end, ellipsis);
+				segment.emplace_back(padRight, end, std::monostate{});
 				segments.emplace_back(std::move(segment));
 				i = lineEnd + 1;
 			}

@@ -17,6 +17,8 @@ project(
 	subproject_dir: 'deps'
 )
 
+cxx = meson.get_compiler('cpp')
+
 extendedWarnings = [
 	'-Wdouble-promotion',
 	'-Wformat=2',
@@ -40,7 +42,7 @@ extendedWarnings = [
 	'-Warith-conversion',
 	'-Wvla-parameter',
 	'-Wduplicated-branches',
-	'-Wshadow=local',
+#	'-Wshadow=local',
 	'-Wunsafe-loop-optimizations',
 	'-Wbad-function-cast',
 	'-Wcast-qual',
@@ -51,7 +53,7 @@ extendedWarnings = [
 	'-Wsign-conversion',
 	'-Wfloat-conversion',
 	'-Wpacked',
-	'-Wpadded',
+#	'-Wpadded',
 	'-Wredundant-decls',
 	'-Winline',
 	'-Wvla',
@@ -59,6 +61,8 @@ extendedWarnings = [
 	'-Wunsuffixed-float-constant',
 	'-Wimplicit-fallthrough'
 ]
+
+add_project_arguments(cxx.get_supported_arguments(extendedWarnings), language: 'cpp')
 
 subdir('include')
 subdir('src')

@@ -4,6 +4,7 @@ subdir('widgets')
 
 contortSrcs = [
 	'decoration.cxx',
+	'eventLoop.cxx',
 	'textLayout.cxx', 'utils.cxx', 'screen.cxx', 'mainLoop.cxx',
 	'widget.cxx', contortWidgetsSrc
 ]

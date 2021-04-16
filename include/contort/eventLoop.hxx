@@ -17,6 +17,7 @@ namespace contort
 	struct CONTORT_CLS_API eventLoop_t
 	{
 	public:
+		virtual ~eventLoop_t() noexcept = default;
 		virtual int32_t watchFile(int32_t fd, event::callback_t callback) = 0;
 		virtual void run() = 0;
 	};
@@ -30,6 +31,7 @@ namespace contort
 		void loop();
 
 	public:
+		~selectEventLoop_t() noexcept = default;
 		int32_t watchFile(int32_t fd, event::callback_t callback) final;
 		void run() final;
 	};

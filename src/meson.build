@@ -22,6 +22,7 @@ contortLibrary = library(
 	'contort',
 	contortSrcs,
 	include_directories: contortInclude,
+	dependencies: [substrate],
 	gnu_symbol_visibility: 'inlineshidden',
 	implicit_include_directories: false,
 	pic: true,

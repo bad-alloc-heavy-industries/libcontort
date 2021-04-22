@@ -17,10 +17,25 @@ namespace contort
 		return handle;
 	}
 
+	bool selectEventLoop_t::removeAlarm(const event::alarm_t &handle)
+	{
+		//alarms_.
+		return false;
+	}
+
 	int32_t selectEventLoop_t::addWatchFile(const int32_t fd, const event::callback_t callback)
 	{
 		watchFiles_[fd] = callback;
 		return fd;
+	}
+
+	bool selectEventLoop_t::removeWatchFile(const int32_t handle)
+	{
+		const auto entry{watchFiles_.find(handle)};
+		if (entry == watchFiles_.end())
+			return false;
+		watchFiles_.erase(entry);
+		return true;
 	}
 
 	size_t selectEventLoop_t::addEnterIdle(const event::callback_t callback)
@@ -28,6 +43,15 @@ namespace contort
 		const auto handle{idleHandle_++};
 		idleCallbacks_.emplace(handle, callback);
 		return handle;
+	}
+
+	bool selectEventLoop_t::removeEnterIdle(const size_t handle)
+	{
+		const auto entry{idleCallbacks_.find(handle)};
+		if (entry == idleCallbacks_.end())
+			return false;
+		idleCallbacks_.erase(entry);
+		return true;
 	}
 
 	void selectEventLoop_t::run()

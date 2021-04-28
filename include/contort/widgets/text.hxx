@@ -41,8 +41,8 @@ namespace contort::widgets
 		void text(const std::string &markup) noexcept { text(std::string_view{markup}); }
 		void text(std::string_view markup) noexcept;
 
-		void alignMode(horizontalAlignment_t align);
-		void wrapMode(wrapping_t wrap);
+		void alignMode(horizontalAlignment_t mode);
+		void wrapMode(wrapping_t mode);
 		void layout(horizontalAlignment_t align, wrapping_t wrap,
 			std::unique_ptr<textLayout_t> textLayout = nullptr);
 	};

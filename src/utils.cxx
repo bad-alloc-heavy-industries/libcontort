@@ -108,16 +108,16 @@ namespace contort::utils
 
 	size_t movePrevChar(const std::string_view text, const size_t begin, const size_t end) noexcept
 	{
-		auto offset{end - 1};
-		while (offset > begin && (text[offset] & 0xC0) == 0x80)
+		auto offset{end - 1U};
+		while (offset > begin && (static_cast<uint8_t>(text[offset]) & 0xC0U) == 0x80U)
 			--offset;
 		return offset;
 	}
 
 	size_t moveNextChar(const std::string_view text, const size_t begin, const size_t end) noexcept
 	{
-		auto offset{begin + 1};
-		while (offset < end && (text[offset] & 0xC0) == 0x80)
+		auto offset{begin + 1U};
+		while (offset < end && (static_cast<uint8_t>(text[offset]) & 0xC0U) == 0x80U)
 			++offset;
 		return offset;
 	}

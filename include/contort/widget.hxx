@@ -87,7 +87,7 @@ namespace contort
 	public:
 		widget_t() noexcept = default;
 
-		auto selectable() const noexcept { return selectable_; }
+		[[nodiscard]] auto selectable() const noexcept { return selectable_; }
 	};
 } // namespace contort
 

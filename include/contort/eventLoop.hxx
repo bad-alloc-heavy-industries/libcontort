@@ -24,13 +24,18 @@ namespace contort
 	struct CONTORT_CLS_API eventLoop_t
 	{
 	public:
+		constexpr eventLoop_t() noexcept = default;
+		eventLoop_t(const eventLoop_t &) noexcept = delete;
+		eventLoop_t(eventLoop_t &&) noexcept = delete;
+		eventLoop_t &operator =(const eventLoop_t &) noexcept = delete;
+		eventLoop_t &operator =(eventLoop_t &&) noexcept = delete;
 		virtual ~eventLoop_t() noexcept = default;
 		virtual event::alarm_t addAlarm(std::chrono::microseconds waitFor, event::callback_t callback) = 0;
 		virtual bool removeAlarm(const event::alarm_t &handle) = 0;
 		virtual int32_t addWatchFile(int32_t fd, event::callback_t callback) = 0;
-		virtual bool removeWatchFile(const int32_t handle) = 0;
+		virtual bool removeWatchFile(int32_t handle) = 0;
 		virtual size_t addEnterIdle(event::callback_t callback) = 0;
-		virtual bool removeEnterIdle(const size_t handle) = 0;
+		virtual bool removeEnterIdle(size_t handle) = 0;
 		virtual void run() = 0;
 	};
 
@@ -48,13 +53,18 @@ namespace contort
 		void loop();
 
 	public:
-		~selectEventLoop_t() noexcept = default;
+		selectEventLoop_t() noexcept = default;
+		selectEventLoop_t(const selectEventLoop_t &) noexcept = delete;
+		selectEventLoop_t(selectEventLoop_t &&) noexcept = delete;
+		selectEventLoop_t &operator =(const selectEventLoop_t &) noexcept = delete;
+		selectEventLoop_t &operator =(selectEventLoop_t &&) noexcept = delete;
+		~selectEventLoop_t() noexcept final = default;
 		event::alarm_t addAlarm(std::chrono::microseconds waitFor, event::callback_t callback) final;
 		bool removeAlarm(const event::alarm_t &handle) final;
 		int32_t addWatchFile(int32_t fd, event::callback_t callback) final;
-		bool removeWatchFile(const int32_t handle) final;
+		bool removeWatchFile(int32_t handle) final;
 		size_t addEnterIdle(event::callback_t callback) final;
-		bool removeEnterIdle(const size_t handle) final;
+		bool removeEnterIdle(size_t handle) final;
 		void run() final;
 	};
 } // namespace contort

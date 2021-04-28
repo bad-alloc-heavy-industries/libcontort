@@ -82,6 +82,7 @@ namespace contort
 	{
 		FD_ZERO(&set);
 		for (const auto fd : fds)
+			// NOLINTNEXTLINE(hicpp-signed-bitwise)
 			FD_SET(fd, &set);
 	}
 
@@ -89,6 +90,7 @@ namespace contort
 	{
 		for (const auto fd : fds)
 		{
+			// NOLINTNEXTLINE(hicpp-signed-bitwise)
 			if (FD_ISSET(fd, &set))
 				return true;
 		}
@@ -113,7 +115,7 @@ namespace contort
 			if (!alarms_.empty())
 			{
 				const auto waitUntil{std::get<0>(alarms_.top())};
-				const auto time{waitUntil - std::chrono::steady_clock().now().time_since_epoch()};
+				const auto time{waitUntil - std::chrono::steady_clock::now().time_since_epoch()};
 				timeout = timeval{};
 				if (time.count() >= 0)
 				{
@@ -151,6 +153,7 @@ namespace contort
 
 		for (const auto fd : watchFDs)
 		{
+			// NOLINTNEXTLINE(hicpp-signed-bitwise)
 			if (FD_ISSET(fd, &readFDs))
 			{
 				watchFiles_[fd]();

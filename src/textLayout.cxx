@@ -58,7 +58,7 @@ namespace contort
 		{ return {}; }
 
 	void standardTextLayout_t::alignLayout(segments_t &layout, const uint32_t width,
-		const horizontalAlignment_t align) const noexcept
+		const horizontalAlignment_t align) noexcept
 	{
 		for (auto &segments : layout)
 		{
@@ -73,7 +73,7 @@ namespace contort
 	}
 
 	segments_t standardTextLayout_t::calculateTextSegments(const std::string_view text,
-		const uint32_t width, const wrapping_t wrap) const
+		const uint32_t width, const wrapping_t wrap)
 	{
 		if (wrapValueIs_t<wrapping_t::clip, wrapping_t::ellipsis>{}(wrap))
 		{

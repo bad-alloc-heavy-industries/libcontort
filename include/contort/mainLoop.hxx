@@ -15,12 +15,13 @@ namespace contort
 	{
 	private:
 		widget_t *widget_;
-		screen_t screen_;
+		std::unique_ptr<screen_t> screen_;
 		std::unique_ptr<eventLoop_t> eventLoop_;
+		bool handleMouse_;
 
 	public:
-		mainLoop_t(widget_t *widget, std::optional<screen_t> screen = std::nullopt,
-			std::unique_ptr<eventLoop_t> eventLoop = {}) noexcept;
+		mainLoop_t(widget_t *widget, std::unique_ptr<screen_t> screen = {},
+			bool handleMouse = true, std::unique_ptr<eventLoop_t> eventLoop = {}) noexcept;
 	};
 } // namespace contort
 

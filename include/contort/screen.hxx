@@ -4,21 +4,76 @@
 
 #include <cstdint>
 #include <cstdio>
+#include <string_view>
+#include <variant>
+#include <optional>
+#include <chrono>
+#include <termios.h>
 #include <contort/defs.hxx>
 #include <substrate/pipe>
 
 namespace contort
 {
-	struct CONTORT_CLS_API screen_t final
+	struct CONTORT_CLS_API screen_t
 	{
+	private:
+		bool started_{false};
+
+	protected:
+		constexpr screen_t(screen_t &&) noexcept = default;
+		screen_t &operator =(screen_t &&) noexcept = default;
+
+		virtual void start_() { }
+		virtual void stop_() { }
+
+	public:
+		constexpr screen_t() noexcept = default;
+		screen_t(const screen_t &) noexcept = delete;
+		screen_t &operator =(const screen_t &) noexcept = delete;
+		virtual ~screen_t() noexcept = default;
+
+		void start();
+		void stop();
+
+		virtual void setMouseTracking(bool enable = true) noexcept = 0;
+	};
+
+	struct CONTORT_CLS_API rawTerminal_t final : screen_t
+	{
+	private:
+		bool resized_{false};
+		bool mouseTrackingEnabled_{false};
+		std::optional<std::size_t> rowsUsed{};
+		std::optional<termios> oldTermiosSettings{};
+		std::optional<std::chrono::seconds> maxWait{};
+		std::optional<std::chrono::seconds> nextTimeout{};
+
 		int32_t termInput{-1};
 		int32_t termOutput{-1};
 		substrate::pipe_t resizePipe{};
 
+		void start_() final;
+		void stop_() final;
+
+		void startGPMTracking();
+		void stopGPMTracking();
+		void mouseTracking(bool enable) noexcept;
+		void sigwinchHandler(int32_t signum) noexcept;
+		void sigcontHandler(int32_t signum) noexcept;
+
 	public:
-		screen_t(FILE *inputFile = stdin, FILE *outputFile = stdout);
-		screen_t(const screen_t &) = delete;
-		screen_t(screen_t &&) = default;
+		rawTerminal_t(FILE *inputFile = stdin, FILE *outputFile = stdout);
+		rawTerminal_t(const rawTerminal_t &) = delete;
+		rawTerminal_t(rawTerminal_t &&) = default;
+		~rawTerminal_t() noexcept final = default;
+		rawTerminal_t &operator =(const rawTerminal_t &) = delete;
+		rawTerminal_t &operator =(rawTerminal_t &&) = default;
+
+		/*[[nodiscard]] bool*/void write(const std::string_view &data) const noexcept;
+
+		void setMouseTracking(bool enable = true) noexcept final;
+		void signalInit() noexcept;
+		void signalRestore() noexcept;
 	};
 } // namespace contort
 

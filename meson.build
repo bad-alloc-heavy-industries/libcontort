@@ -67,3 +67,9 @@ add_project_arguments(cxx.get_supported_arguments(extendedWarnings), language: '
 subdir('include')
 subdir('src')
 subdir('test')
+
+runClangTidy = find_program('runClangTidy.py')
+run_target(
+	'clang-tidy',
+	command: [runClangTidy, '-s', meson.current_source_dir(), '-p', meson.current_build_dir()]
+)

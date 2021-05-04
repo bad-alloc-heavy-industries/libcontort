@@ -8,10 +8,11 @@ namespace contort
 {
 	namespace event { struct idle_t final { }; }
 
-	event::alarm_t selectEventLoop_t::addAlarm(std::chrono::microseconds waitFor, event::callback_t callback)
+	event::alarm_t selectEventLoop_t::addAlarm(std::chrono::microseconds waitFor,
+		std::function<event::callback_t> callback)
 	{
 		const auto time{std::chrono::steady_clock::now().time_since_epoch() + waitFor};
-		const auto handle{event::alarm_t{std::chrono::duration_cast<std::chrono::microseconds>(time),
+		auto handle{event::alarm_t{std::chrono::duration_cast<std::chrono::microseconds>(time),
 			tieBreak_++, callback}};
 		alarms_.push(handle);
 		return handle;
@@ -23,7 +24,7 @@ namespace contort
 		return false;
 	}
 
-	int32_t selectEventLoop_t::addWatchFile(const int32_t fd, const event::callback_t callback)
+	int32_t selectEventLoop_t::addWatchFile(const int32_t fd, std::function<event::callback_t> callback)
 	{
 		watchFiles_[fd] = callback;
 		return fd;
@@ -38,7 +39,7 @@ namespace contort
 		return true;
 	}
 
-	size_t selectEventLoop_t::addEnterIdle(const event::callback_t callback)
+	size_t selectEventLoop_t::addEnterIdle(std::function<event::callback_t> callback)
 	{
 		const auto handle{idleHandle_++};
 		idleCallbacks_.emplace(handle, callback);
@@ -69,7 +70,7 @@ namespace contort
 			callback();
 	}
 
-	inline auto gatherFDs(const std::map<int32_t, event::callback_t> &watchFiles)
+	inline auto gatherFDs(const std::map<int32_t, std::function<event::callback_t>> &watchFiles)
 	{
 		substrate::fixedVector_t<int32_t> fds{watchFiles.size()};
 		size_t index{0};

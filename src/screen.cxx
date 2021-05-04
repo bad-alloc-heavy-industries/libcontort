@@ -200,6 +200,41 @@ namespace contort
 		screen_t::stop_();
 	}
 
+	std::vector<int32_t> rawTerminal_t::getAvailableRawInput() const
+	{
+		auto codes{getGPMCodes()};
+		const auto keyCodes{getKeyCodes()};
+		codes.insert(codes.end(), keyCodes.begin(), keyCodes.end());
+
+		// TODO: clean resizePipe out
+		return codes;
+	}
+
+	std::optional<char> rawTerminal_t::tryReadChar() const
+	{
+		char value{};
+		const auto result{read(termInput, &value, 1)};
+		if (result == -1 && errno == EAGAIN)
+			return std::nullopt;
+		else if (result < 0)
+			throw ioError_t{};
+		return value;
+	}
+
+	std::vector<int32_t> rawTerminal_t::getKeyCodes() const
+	{
+		std::vector<int32_t> codes{};
+		while (true)
+		{
+			const auto code{tryReadChar()};
+			if (code)
+				codes.emplace_back(*code);
+			else
+				break;
+		}
+		return codes;
+	}
+
 	void rawTerminal_t::startGPMTracking()
 	{
 	}

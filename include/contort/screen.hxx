@@ -69,6 +69,8 @@ namespace contort
 		void stopGPMTracking();
 		std::vector<int32_t> getGPMCodes() const;
 		void mouseTracking(bool enable);
+		std::optional<char> tryReadChar() const;
+		std::vector<int32_t> getKeyCodes() const;
 		void sigwinchHandler(int32_t signum) noexcept;
 		void sigcontHandler(int32_t signum) noexcept;
 
@@ -85,6 +87,7 @@ namespace contort
 		[[nodiscard]] bool write(const std::string_view &data) const noexcept;
 
 		void setMouseTracking(bool enable = true) final;
+		[[nodiscard]] std::vector<int32_t> getAvailableRawInput() const;
 
 		void signalInit() noexcept;
 		void signalRestore() noexcept;

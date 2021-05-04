@@ -25,6 +25,7 @@ namespace contort
 		mainLoop_t(widget_t *widget, std::unique_ptr<screen_t> screen = {},
 			bool handleMouse = true, std::unique_ptr<eventLoop_t> eventLoop = {}) noexcept;
 
+		int32_t run();
 		void start();
 		void stop();
 	};

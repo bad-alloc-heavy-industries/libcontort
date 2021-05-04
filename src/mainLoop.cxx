@@ -15,6 +15,20 @@ namespace contort
 			eventLoop_ = std::make_unique<selectEventLoop_t>();
 	}
 
+	int32_t mainLoop_t::run()
+	{
+		start();
+		try
+			{ eventLoop_->run(); }
+		catch (...)
+		{
+			screen_->stop();
+			throw;
+		}
+		stop();
+		return 0;
+	}
+
 	void mainLoop_t::start()
 	{
 		screen_->start();

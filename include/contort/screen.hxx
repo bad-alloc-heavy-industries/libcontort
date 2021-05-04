@@ -49,6 +49,7 @@ namespace contort
 	private:
 		bool resized_{false};
 		bool mouseTrackingEnabled_{false};
+		bool setupG1Done_{false};
 		std::optional<std::size_t> rowsUsed{};
 		std::optional<termios> oldTermiosSettings{};
 		std::optional<std::chrono::seconds> maxWait{};
@@ -63,9 +64,11 @@ namespace contort
 
 		void startGPMTracking();
 		void stopGPMTracking();
-		void mouseTracking(bool enable) noexcept;
+		void mouseTracking(bool enable);
 		void sigwinchHandler(int32_t signum) noexcept;
 		void sigcontHandler(int32_t signum) noexcept;
+
+		void setupG1() noexcept;
 
 	public:
 		rawTerminal_t(FILE *inputFile = stdin, FILE *outputFile = stdout);
@@ -81,6 +84,7 @@ namespace contort
 
 		void signalInit() noexcept;
 		void signalRestore() noexcept;
+		void clear() noexcept;
 	};
 } // namespace contort
 

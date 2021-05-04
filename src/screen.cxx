@@ -24,10 +24,19 @@ namespace contort
 
 	namespace escapes
 	{
-		constexpr static auto switchToAlternateBuffer{"\x1B\x07\x1B[?47h"sv};
+		constexpr static auto charSO{"\x0E"sv};
+		constexpr static auto charSI{"\x0F"sv};
+
+		constexpr static auto switchToAlternateBuffer{"\x1B\x37\x1B[?47h"sv};
+		constexpr static auto restoreNormalBuffer{"\x1B[?47l\x1B\x38"sv};
+
+		constexpr static auto hideCursor{"\x1B[?25l"sv};
+		constexpr static auto showCursor{"\x1B[?25h"sv};
 
 		constexpr static auto mouseTrackingOn{"\x1B[?1000h\x1B[?1002h"sv};
 		constexpr static auto mouseTrackingOff{"\x1B[?1002l\x1B[?1000l"sv};
+
+		constexpr static auto designateG1Special{"\x1B[K"sv};
 	} // namespace escapes
 
 	void screen_t::start()
@@ -105,7 +114,7 @@ namespace contort
 			// TODO: Give writePipe_t support for the nicer IO functions
 			[[maybe_unused]] const auto result{resizePipe.writeFD().write("R", 1)};//.write('R');
 		resized_ = true;
-		//screenBuf = nullptr | std::nullopt;
+		//screenBuff = nullptr | std::nullopt;
 	}
 
 	void rawTerminal_t::sigcontHandler(const int32_t) noexcept
@@ -154,8 +163,39 @@ namespace contort
 
 	void rawTerminal_t::stop_()
 	{
+		clear();
+		//signals.emitSignal(this, INPUT_DESCRIPTORS_CHANGED)
 		signalRestore();
 
+		if (isatty(termInput))
+		{
+			termios settings{*oldTermiosSettings};
+			tcsetattr(termInput, TCSADRAIN, &settings);
+		}
+
+		mouseTracking(false);
+		if (!write(escapes::charSI) ||
+			!write(escapes::restoreNormalBuffer) ||
+			!write(escapes::showCursor))
+			throw ioError_t{};
+
+		// signal keys?
+
 		screen_t::stop_();
+	}
+
+	void rawTerminal_t::setupG1() noexcept
+	{
+		if (setupG1Done_)
+			return;
+		while (!write(escapes::designateG1Special))
+			continue;
+		setupG1Done_ = true;
+	}
+
+	void rawTerminal_t::clear() noexcept
+	{
+		//screenBuff = nullptr | std::nullopt;
+		setupG1Done_ = true;
 	}
 } // namespace contort

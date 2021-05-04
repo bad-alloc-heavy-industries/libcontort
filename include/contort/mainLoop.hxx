@@ -19,7 +19,9 @@ namespace contort
 		std::unique_ptr<eventLoop_t> eventLoop_;
 		bool handleMouse_;
 
-		void update(const std::vector<int32_t> &keys, const std::vector<int32_t> &raw) noexcept;
+		void update(const std::vector<int32_t> &keys, const std::vector<int32_t> &rawKeystrokes) noexcept;
+		[[nodiscard]] std::vector<int32_t> inputFilter(const std::vector<int32_t> &keys,
+			const std::vector<int32_t> &rawKeystrokes) const noexcept;
 
 	public:
 		mainLoop_t(widget_t *widget, std::unique_ptr<screen_t> screen = {},

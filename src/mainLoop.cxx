@@ -37,8 +37,8 @@ namespace contort
 
 		screen_->unhookEventLoop(*eventLoop_);
 		screen_->hookEventLoop(*eventLoop_,
-			[this](const std::vector<int32_t> &keys, const std::vector<int32_t> &raw)
-				{ update(keys, raw); }
+			[this](const std::vector<int32_t> &keys, const std::vector<int32_t> &rawKeystrokes)
+				{ update(keys, rawKeystrokes); }
 		);
 	}
 
@@ -48,7 +48,13 @@ namespace contort
 		screen_->stop();
 	}
 
-	void mainLoop_t::update(const std::vector<int32_t> &keys, const std::vector<int32_t> &raw) noexcept
+	void mainLoop_t::update(const std::vector<int32_t> &keys, const std::vector<int32_t> &rawKeystrokes) noexcept
 	{
+	}
+
+	std::vector<int32_t> mainLoop_t::inputFilter(const std::vector<int32_t> &keys,
+		const std::vector<int32_t> &/*rawKeystrokes*/) const noexcept
+	{
+		return keys;
 	}
 } // namespace contort

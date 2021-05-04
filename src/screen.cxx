@@ -200,6 +200,16 @@ namespace contort
 		screen_t::stop_();
 	}
 
+	fixedVector_t<int32_t> rawTerminal_t::inputDescriptors() const
+	{
+		/*if (!started_)
+			return {};*/
+		fixedVector_t<int32_t> result{2};
+		result[0] = resizePipe.readFD();
+		result[1] = termInput;
+		return result;
+	}
+
 	std::vector<int32_t> rawTerminal_t::getAvailableRawInput() const
 	{
 		auto codes{getGPMCodes()};

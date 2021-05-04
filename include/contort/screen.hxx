@@ -13,6 +13,7 @@
 #include <termios.h>
 #include <contort/defs.hxx>
 #include <substrate/pipe>
+#include <substrate/fixed_vector>
 
 namespace contort
 {
@@ -93,6 +94,7 @@ namespace contort
 		[[nodiscard]] bool write(const std::string_view &data) const noexcept;
 
 		void setMouseTracking(bool enable = true) final;
+		[[nodiscard]] substrate::fixedVector_t<int32_t> inputDescriptors() const;
 		[[nodiscard]] std::vector<int32_t> getAvailableRawInput() const;
 		void parseInput(eventLoop_t *eventLoop, const std::function<screen::callback_t> &callback,
 			std::vector<int32_t> codes, bool waitForMore = true);

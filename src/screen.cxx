@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <fcntl.h>
 #include <termios.h>
+#include <sys/ioctl.h>
 #include <csignal>
 #include <substrate/indexed_iterator>
 #include <contort/screen.hxx>
@@ -296,6 +297,19 @@ namespace contort
 	std::vector<int32_t> rawTerminal_t::getGPMCodes() const
 	{
 		return {};
+	}
+
+	screen::point_t rawTerminal_t::colsRows() const noexcept
+	{
+		screen::point_t result{80, 24};
+		winsize size{};
+		if (ioctl(termOutput, TIOCGWINSZ, &size) >= 0)
+		{
+			result.x = size.ws_col;
+			result.y = size.ws_row;
+		}
+		// maxRow = result.y
+		return result;
 	}
 
 	void rawTerminal_t::setupG1() noexcept

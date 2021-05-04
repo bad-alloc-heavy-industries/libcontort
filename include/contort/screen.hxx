@@ -21,6 +21,12 @@ namespace contort
 	namespace screen
 	{
 		using callback_t = void(const std::vector<int32_t> &, const std::vector<int32_t> &);
+
+		struct point_t final
+		{
+			std::size_t x;
+			std::size_t y;
+		};
 	}
 
 	struct CONTORT_CLS_API ioError_t final : std::exception
@@ -53,6 +59,8 @@ namespace contort
 
 		virtual void hookEventLoop(eventLoop_t &eventLoop, std::function<screen::callback_t> callback) = 0;
 		virtual void unhookEventLoop(eventLoop_t &eventLoop) = 0;
+
+		[[nodiscard]] virtual screen::point_t colsRows() const noexcept = 0;
 	};
 
 	struct CONTORT_CLS_API rawTerminal_t final : screen_t
@@ -80,10 +88,10 @@ namespace contort
 
 		void startGPMTracking();
 		void stopGPMTracking();
-		std::vector<int32_t> getGPMCodes() const;
+		[[nodiscard]] std::vector<int32_t> getGPMCodes() const;
 		void mouseTracking(bool enable);
-		std::optional<char> tryReadChar() const;
-		std::vector<int32_t> getKeyCodes() const;
+		[[nodiscard]] std::optional<char> tryReadChar() const;
+		[[nodiscard]] std::vector<int32_t> getKeyCodes() const;
 		void sigwinchHandler(int32_t signum) noexcept;
 		void sigcontHandler(int32_t signum) noexcept;
 
@@ -106,6 +114,8 @@ namespace contort
 		[[nodiscard]] std::vector<int32_t> getAvailableRawInput() const;
 		void parseInput(eventLoop_t *eventLoop, const std::function<screen::callback_t> &callback,
 			std::vector<int32_t> codes, bool waitForMore = true);
+
+		[[nodiscard]] screen::point_t colsRows() const noexcept final;
 
 		void signalInit() noexcept;
 		void signalRestore() noexcept;

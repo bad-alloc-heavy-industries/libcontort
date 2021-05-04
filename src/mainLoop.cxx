@@ -14,4 +14,27 @@ namespace contort
 		if (!eventLoop_)
 			eventLoop_ = std::make_unique<selectEventLoop_t>();
 	}
+
+	void mainLoop_t::start()
+	{
+		screen_->start();
+		if (handleMouse_)
+			screen_->setMouseTracking();
+
+		screen_->unhookEventLoop(*eventLoop_);
+		screen_->hookEventLoop(*eventLoop_,
+			[this](const std::vector<int32_t> &keys, const std::vector<int32_t> &raw)
+				{ update(keys, raw); }
+		);
+	}
+
+	void mainLoop_t::stop()
+	{
+		screen_->unhookEventLoop(*eventLoop_);
+		screen_->stop();
+	}
+
+	void mainLoop_t::update(const std::vector<int32_t> &keys, const std::vector<int32_t> &raw) noexcept
+	{
+	}
 } // namespace contort

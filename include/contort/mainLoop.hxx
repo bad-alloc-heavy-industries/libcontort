@@ -19,9 +19,14 @@ namespace contort
 		std::unique_ptr<eventLoop_t> eventLoop_;
 		bool handleMouse_;
 
+		void update(const std::vector<int32_t> &keys, const std::vector<int32_t> &raw) noexcept;
+
 	public:
 		mainLoop_t(widget_t *widget, std::unique_ptr<screen_t> screen = {},
 			bool handleMouse = true, std::unique_ptr<eventLoop_t> eventLoop = {}) noexcept;
+
+		void start();
+		void stop();
 	};
 } // namespace contort
 

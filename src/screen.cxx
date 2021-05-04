@@ -5,9 +5,12 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <csignal>
+#include <substrate/indexed_iterator>
 #include <contort/screen.hxx>
 
 using namespace std::literals::string_view_literals;
+using substrate::fixedVector_t;
+using substrate::indexedIterator_t;
 
 namespace contort
 {
@@ -208,6 +211,28 @@ namespace contort
 		result[0] = resizePipe.readFD();
 		result[1] = termInput;
 		return result;
+	}
+
+	void rawTerminal_t::hookEventLoop(eventLoop_t &eventLoop, std::function<screen::callback_t> callback)
+	{
+		const auto wrapper = [this, &eventLoop, callback]()
+			{ parseInput(&eventLoop, callback, getAvailableRawInput()); };
+		const auto fds{inputDescriptors()};
+		fixedVector_t<int32_t> handles{fds.count()};
+		for (const auto &[index, fd] : indexedIterator_t{handles})
+			handles[index] = eventLoop.addWatchFile(*fd, wrapper);
+		eventLoopHandles = std::move(handles);
+	}
+
+	void rawTerminal_t::unhookEventLoop(eventLoop_t &eventLoop)
+	{
+		for (const auto handle : eventLoopHandles)
+			eventLoop.removeWatchFile(handle);
+		if (inputTimeout)
+		{
+			eventLoop.removeAlarm(*inputTimeout);
+			inputTimeout = std::nullopt;
+		}
 	}
 
 	std::vector<int32_t> rawTerminal_t::getAvailableRawInput() const

@@ -14,6 +14,7 @@
 #include <contort/defs.hxx>
 #include <substrate/pipe>
 #include <substrate/fixed_vector>
+#include "eventLoop.hxx"
 
 namespace contort
 {
@@ -49,6 +50,9 @@ namespace contort
 		void stop();
 
 		virtual void setMouseTracking(bool enable = true) = 0;
+
+		virtual void hookEventLoop(eventLoop_t &eventLoop, std::function<screen::callback_t> callback) = 0;
+		virtual void unhookEventLoop(eventLoop_t &eventLoop) = 0;
 	};
 
 	struct CONTORT_CLS_API rawTerminal_t final : screen_t
@@ -61,6 +65,8 @@ namespace contort
 		std::optional<termios> oldTermiosSettings{};
 		std::optional<std::chrono::seconds> maxWait{};
 		std::optional<std::chrono::seconds> nextTimeout{};
+		substrate::fixedVector_t<int32_t> eventLoopHandles{};
+		std::optional<event::alarm_t> inputTimeout{};
 
 		int32_t termInput{-1};
 		int32_t termOutput{-1};
@@ -95,6 +101,8 @@ namespace contort
 
 		void setMouseTracking(bool enable = true) final;
 		[[nodiscard]] substrate::fixedVector_t<int32_t> inputDescriptors() const;
+		void hookEventLoop(eventLoop_t &eventLoop, std::function<screen::callback_t> callback) final;
+		void unhookEventLoop(eventLoop_t &eventLoop) final;
 		[[nodiscard]] std::vector<int32_t> getAvailableRawInput() const;
 		void parseInput(eventLoop_t *eventLoop, const std::function<screen::callback_t> &callback,
 			std::vector<int32_t> codes, bool waitForMore = true);

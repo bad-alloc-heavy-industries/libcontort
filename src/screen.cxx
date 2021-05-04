@@ -53,11 +53,15 @@ namespace contort
 		fcntl(resizePipe.readFD(), F_SETFL, O_NONBLOCK);
 	}
 
-	/*bool*/void rawTerminal_t::write(const std::string_view &data) const noexcept
-		{ ::write(termOutput, data.data(), data.size()); }
-		//{ return ::write(termOutput, data.data(), data.size()) == data.size(); }
+	bool rawTerminal_t::write(const std::string_view &data) const noexcept
+	{
+		const auto result{::write(termOutput, data.data(), data.size())};
+		if (result < 0)
+			return false;
+		return size_t(result) == data.size();
+	}
 
-	void rawTerminal_t::setMouseTracking(const bool enable) noexcept
+	void rawTerminal_t::setMouseTracking(const bool enable)
 	{
 		if (mouseTrackingEnabled_ == enable)
 			return;
@@ -65,9 +69,10 @@ namespace contort
 		mouseTrackingEnabled_ = enable;
 	}
 
-	void rawTerminal_t::mouseTracking(const bool enable) noexcept
+	void rawTerminal_t::mouseTracking(const bool enable)
 	{
-		write(enable ? escapes::mouseTrackingOn : escapes::mouseTrackingOff);
+		if (!write(enable ? escapes::mouseTrackingOn : escapes::mouseTrackingOff))
+			throw ioError_t{};
 		if (enable)
 			startGPMTracking();
 		else
@@ -113,7 +118,8 @@ namespace contort
 	// https://github.com/python/cpython/blob/63298930fb531ba2bb4f23bc3b915dbf1e17e9e1/Lib/tty.py
 	void rawTerminal_t::start_()
 	{
-		write(escapes::switchToAlternateBuffer);
+		if (!write(escapes::switchToAlternateBuffer))
+			throw ioError_t{};
 		rowsUsed = std::nullopt;
 
 		if (isatty(termInput))

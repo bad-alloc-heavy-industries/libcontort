@@ -8,12 +8,18 @@
 #include <variant>
 #include <optional>
 #include <chrono>
+#include <exception>
 #include <termios.h>
 #include <contort/defs.hxx>
 #include <substrate/pipe>
 
 namespace contort
 {
+	struct CONTORT_CLS_API ioError_t final : std::exception
+	{
+		[[nodiscard]] const char *what() const noexcept final { return "Error during IO operation"; }
+	};
+
 	struct CONTORT_CLS_API screen_t
 	{
 	private:
@@ -35,7 +41,7 @@ namespace contort
 		void start();
 		void stop();
 
-		virtual void setMouseTracking(bool enable = true) noexcept = 0;
+		virtual void setMouseTracking(bool enable = true) = 0;
 	};
 
 	struct CONTORT_CLS_API rawTerminal_t final : screen_t
@@ -69,9 +75,10 @@ namespace contort
 		rawTerminal_t &operator =(const rawTerminal_t &) = delete;
 		rawTerminal_t &operator =(rawTerminal_t &&) = default;
 
-		/*[[nodiscard]] bool*/void write(const std::string_view &data) const noexcept;
+		[[nodiscard]] bool write(const std::string_view &data) const noexcept;
 
-		void setMouseTracking(bool enable = true) noexcept final;
+		void setMouseTracking(bool enable = true) final;
+
 		void signalInit() noexcept;
 		void signalRestore() noexcept;
 	};

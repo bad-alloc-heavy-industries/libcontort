@@ -8,6 +8,7 @@
 #include <variant>
 #include <optional>
 #include <chrono>
+#include <functional>
 #include <exception>
 #include <termios.h>
 #include <contort/defs.hxx>
@@ -15,6 +16,11 @@
 
 namespace contort
 {
+	namespace screen
+	{
+		using callback_t = void(const std::vector<int32_t> &, const std::vector<int32_t> &);
+	}
+
 	struct CONTORT_CLS_API ioError_t final : std::exception
 	{
 		[[nodiscard]] const char *what() const noexcept final { return "Error during IO operation"; }
@@ -88,6 +94,8 @@ namespace contort
 
 		void setMouseTracking(bool enable = true) final;
 		[[nodiscard]] std::vector<int32_t> getAvailableRawInput() const;
+		void parseInput(eventLoop_t *eventLoop, const std::function<screen::callback_t> &callback,
+			std::vector<int32_t> codes, bool waitForMore = true);
 
 		void signalInit() noexcept;
 		void signalRestore() noexcept;

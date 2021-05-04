@@ -210,6 +210,21 @@ namespace contort
 		return codes;
 	}
 
+	void rawTerminal_t::parseInput(eventLoop_t *eventLoop, const std::function<screen::callback_t> &callback,
+		std::vector<int32_t> codes, const bool waitForMore)
+	{
+		if (inputTimeout && eventLoop)
+		{
+			eventLoop->removeAlarm(*inputTimeout);
+			inputTimeout = std::nullopt;
+		}
+
+		std::vector<int32_t> processed{};
+		std::vector<int32_t> processedCodes{};
+
+		callback(processed, processedCodes);
+	}
+
 	std::optional<char> rawTerminal_t::tryReadChar() const
 	{
 		char value{};

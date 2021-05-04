@@ -67,6 +67,7 @@ namespace contort
 
 		void startGPMTracking();
 		void stopGPMTracking();
+		std::vector<int32_t> getGPMCodes() const;
 		void mouseTracking(bool enable);
 		void sigwinchHandler(int32_t signum) noexcept;
 		void sigcontHandler(int32_t signum) noexcept;

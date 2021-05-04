@@ -200,6 +200,19 @@ namespace contort
 		screen_t::stop_();
 	}
 
+	void rawTerminal_t::startGPMTracking()
+	{
+	}
+
+	void rawTerminal_t::stopGPMTracking()
+	{
+	}
+
+	std::vector<int32_t> rawTerminal_t::getGPMCodes() const
+	{
+		return {};
+	}
+
 	void rawTerminal_t::setupG1() noexcept
 	{
 		if (setupG1Done_)

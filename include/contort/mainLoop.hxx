@@ -16,12 +16,14 @@ namespace contort
 	private:
 		widget_t *widget_;
 		std::unique_ptr<screen_t> screen_;
+		std::optional<screen::point_t> screenSize_{};
 		std::unique_ptr<eventLoop_t> eventLoop_;
 		bool handleMouse_;
 
 		void update(const std::vector<int32_t> &keys, const std::vector<int32_t> &rawKeystrokes) noexcept;
 		[[nodiscard]] std::vector<int32_t> inputFilter(const std::vector<int32_t> &keys,
 			const std::vector<int32_t> &rawKeystrokes) const noexcept;
+		bool processInput(const std::vector<int32_t> &keys) noexcept;
 
 	public:
 		mainLoop_t(widget_t *widget, std::unique_ptr<screen_t> screen = {},

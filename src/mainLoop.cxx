@@ -50,6 +50,22 @@ namespace contort
 
 	void mainLoop_t::update(const std::vector<int32_t> &keys, const std::vector<int32_t> &rawKeystrokes) noexcept
 	{
+		const auto filteredKeys{inputFilter(keys, rawKeystrokes)};
+		if (!filteredKeys.empty())
+		{
+			processInput(filteredKeys);
+		}
+	}
+
+	bool mainLoop_t::processInput(const std::vector<int32_t> &keys) noexcept
+	{
+		if (!screenSize_)
+			screenSize_ = screen_->colsRows();
+		bool result{false};
+		for (const auto &key : keys)
+		{
+		}
+		return result;
 	}
 
 	std::vector<int32_t> mainLoop_t::inputFilter(const std::vector<int32_t> &keys,

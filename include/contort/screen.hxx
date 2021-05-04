@@ -62,6 +62,9 @@ namespace contort
 		void start_() final;
 		void stop_() final;
 
+		void setInputNonBlock() const noexcept;
+		void clearInputNonBlock() const noexcept;
+
 		void startGPMTracking();
 		void stopGPMTracking();
 		void mouseTracking(bool enable);

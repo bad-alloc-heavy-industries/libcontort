@@ -124,6 +124,20 @@ namespace contort
 		sigwinchHandler(0);
 	}
 
+	void rawTerminal_t::setInputNonBlock() const noexcept
+	{
+		const auto flags{fcntl(termInput, F_GETFL)};
+		// NOLINTNEXTLINE(hicpp-signed-bitwise)
+		fcntl(termInput, F_SETFL, flags | O_NONBLOCK);
+	}
+
+	void rawTerminal_t::clearInputNonBlock() const noexcept
+	{
+		const auto flags{fcntl(termInput, F_GETFL)};
+		// NOLINTNEXTLINE(hicpp-signed-bitwise)
+		fcntl(termInput, F_SETFL, flags & (~O_NONBLOCK));
+	}
+
 	// https://github.com/python/cpython/blob/63298930fb531ba2bb4f23bc3b915dbf1e17e9e1/Lib/tty.py
 	void rawTerminal_t::start_()
 	{
@@ -131,6 +145,7 @@ namespace contort
 			throw ioError_t{};
 		rowsUsed = std::nullopt;
 
+		setInputNonBlock();
 		if (isatty(termInput))
 		{
 			termios result{};
@@ -167,6 +182,7 @@ namespace contort
 		//signals.emitSignal(this, INPUT_DESCRIPTORS_CHANGED)
 		signalRestore();
 
+		clearInputNonBlock();
 		if (isatty(termInput))
 		{
 			termios settings{*oldTermiosSettings};
